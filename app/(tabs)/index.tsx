@@ -1,6 +1,5 @@
 import { Text, View } from "react-native";
-
-export default function Index() {
+export default function FavouritePokemon() {
   return (
     <View
       style={{
@@ -9,7 +8,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Text>Favourite Pokemon</Text>
     </View>
   );
 }
