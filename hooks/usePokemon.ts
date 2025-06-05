@@ -8,6 +8,7 @@ const fetchPokemons = async ({ pageParam = 0 }: { pageParam: number }) => {
       `https://pokeapi.co/api/v2/pokemon?offset=${pageParam}&limit=${PAGE_SIZE}`,
     );
     const results = response.data.results;
+    const count = response.data.count;
     const detailedResponse = await Promise.all(
       results.map(async (p: any) => {
         const singleResponse = await axios.get(p.url);
@@ -23,7 +24,7 @@ const fetchPokemons = async ({ pageParam = 0 }: { pageParam: number }) => {
         };
       }),
     );
-    return detailedResponse;
+    return { detailedResponse, count };
   } catch (error) {
     console.error("Error fetching pokemons:", error);
     throw new Error("Failed to fetch pokemons");
@@ -34,7 +35,7 @@ export const useGetPokemons = () => {
   return useInfiniteQuery<
     Pokemon[],
     Error,
-    { pageParams: any; pages: Pokemon[][] }
+    { pageParams: any; pages: { count: number; detailedResponse: Pokemon[] }[] }
   >({
     queryKey: ["pokemons"],
     queryFn: fetchPokemons,
