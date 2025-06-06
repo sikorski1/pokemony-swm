@@ -1,7 +1,18 @@
-import { Pokemon } from "@/types/pokemon";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { Pokemon, PokemonStats, StatKey } from "@/types/pokemon";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 const PAGE_SIZE = 30;
+const statOrder: StatKey[] = [
+  "hp",
+  "speed",
+  "attack",
+  "special-attack",
+  "defense",
+  "special-defense",
+];
+const statIndexMap = new Map<StatKey, number>(
+  statOrder.map((key, index) => [key, index]),
+);
 const fetchPokemons = async ({ pageParam = 0 }: { pageParam: number }) => {
   try {
     const response = await axios.get(
@@ -11,16 +22,26 @@ const fetchPokemons = async ({ pageParam = 0 }: { pageParam: number }) => {
     const count = response.data.count;
     const detailedResponse = await Promise.all(
       results.map(async (p: any) => {
-        const singleResponse = await axios.get(p.url);
-        const name = singleResponse.data.forms[0].name;
-        const image = singleResponse.data.sprites.front_default;
-        const types = singleResponse.data.types.map(
-          (type: any) => type.type.name,
-        );
+        const response = await axios.get(p.url);
+        const name = response.data.forms[0].name;
+        const image = response.data.sprites.front_shiny;
+        const types = response.data.types.map((type: any) => type.type.name);
+        const stats = response.data.stats
+          .map((singleStat: any) => {
+            const { base_stat, stat } = singleStat;
+            return { base_stat, name: stat.name };
+          })
+          .sort((a: PokemonStats, b: PokemonStats) => {
+            return (
+              (statIndexMap.get(a.name as StatKey) ?? Infinity) -
+              (statIndexMap.get(b.name as StatKey) ?? Infinity)
+            );
+          });
         return {
           name,
           image,
           types,
+          stats,
         };
       }),
     );
@@ -30,7 +51,36 @@ const fetchPokemons = async ({ pageParam = 0 }: { pageParam: number }) => {
     throw new Error("Failed to fetch pokemons");
   }
 };
-
+const fetchFavouritePokemon = async (pokemonName: string) => {
+  try {
+    const response = await axios.get(
+      `https://pokeapi.co/api/v2/pokemon/${pokemonName}`,
+    );
+    const name = response.data.forms[0].name;
+    const image = response.data.sprites.front_shiny;
+    const types = response.data.types.map((type: any) => type.type.name);
+    const stats = response.data.stats
+      .map((singleStat: any) => {
+        const { base_stat, stat } = singleStat;
+        return { base_stat, name: stat.name };
+      })
+      .sort((a: PokemonStats, b: PokemonStats) => {
+        return (
+          (statIndexMap.get(a.name as StatKey) ?? Infinity) -
+          (statIndexMap.get(b.name as StatKey) ?? Infinity)
+        );
+      });
+    return {
+      name,
+      image,
+      types,
+      stats,
+    };
+  } catch (error) {
+    console.error("Error fetching favourite pokemon:", error);
+    throw new Error("Failed to favourite pokemon");
+  }
+};
 export const useGetPokemons = () => {
   return useInfiniteQuery<
     Pokemon[],
@@ -41,5 +91,13 @@ export const useGetPokemons = () => {
     queryFn: fetchPokemons,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === 0 ? undefined : allPages.length * PAGE_SIZE,
+  });
+};
+
+export const useGetFavouritePokemon = (pokemonName?: string) => {
+  return useQuery<Pokemon, Error>({
+    queryKey: ["favouritePokemon", pokemonName],
+    queryFn: () => fetchFavouritePokemon(pokemonName!),
+    enabled: !!pokemonName,
   });
 };

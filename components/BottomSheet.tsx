@@ -1,12 +1,17 @@
+import { useThemeColor } from "@/hooks/useThemeColor";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { Ref } from "react";
-import { Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-export default function BottomSheet({ ref }: { ref: Ref<BottomSheetModal> }) {
+export default function BottomSheet({
+  ref,
+  children,
+}: {
+  ref: Ref<BottomSheetModal>;
+  children: React.ReactNode;
+}) {
   return (
     <BottomSheetModal
       ref={ref}
@@ -17,11 +22,15 @@ export default function BottomSheet({ ref }: { ref: Ref<BottomSheetModal> }) {
           appearsOnIndex={0}
         />
       )}
+      handleStyle={{ backgroundColor: useThemeColor({}, "bgSoftPrimary") }}
+      handleIndicatorStyle={{
+        backgroundColor: useThemeColor({}, "bgStrongPrimary"),
+      }}
     >
-      <BottomSheetView>
-        <SafeAreaView edges={["bottom"]}>
-          <Text>123</Text>
-        </SafeAreaView>
+      <BottomSheetView
+        style={{ backgroundColor: useThemeColor({}, "bgSoftPrimary") }}
+      >
+        {children}
       </BottomSheetView>
     </BottomSheetModal>
   );

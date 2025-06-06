@@ -59,7 +59,7 @@ export const Colors = {
  
     // Misc
     bgBackdrop: "rgba(0, 0, 0, 0.24)",
-    favorite: "#F95EAD",
+    favorite: "#F9E5AD",
  
     // Text
     textDefaultPrimary: "#000000",

@@ -9,8 +9,6 @@ type Props = {
   index: number;
   onPress: () => void;
 };
-const blurhash =
-  "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 export default function PokemonItem({ pokemon, index, onPress }: Props) {
   const theme = useColorScheme();
   return (
@@ -34,7 +32,6 @@ export default function PokemonItem({ pokemon, index, onPress }: Props) {
           },
         ]}
         source={pokemon.image}
-        placeholder={{ blurhash }}
         contentFit="cover"
         transition={1000}
       ></Image>
@@ -67,7 +64,7 @@ export default function PokemonItem({ pokemon, index, onPress }: Props) {
                 styles.pokemonType,
                 { backgroundColor: Colors[theme ?? "light"][colorType] },
               ]}
-            ></View>
+            />
           );
         })}
       </View>
@@ -104,7 +101,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   pokemonTypeBox: {
-    marginLeft:"auto",
+    marginLeft: "auto",
     display: "flex",
     flexDirection: "row",
     alignSelf: "center",

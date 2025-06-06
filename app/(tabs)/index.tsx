@@ -2,32 +2,64 @@ import Search from "@/assets/icons/search.svg";
 import SettingsIcon from "@/assets/icons/settings.svg";
 import Logo from "@/assets/images/favicon.svg";
 import BottomSheet from "@/components/BottomSheet";
+import BottomSheetContent from "@/components/BottomSheetContent";
+import FavouritePokemon from "@/components/FavouritePokemon";
 import PokemonItem from "@/components/PokemonItem";
-import { useGetPokemons } from "@/hooks/usePokemon";
+import { useGetFavouritePokemon, useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon } from "@/types/pokemon";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import { useMMKVString } from "react-native-mmkv";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function PokemonList() {
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const [favouritePokemon, setFavouritePokemon] =
+    useMMKVString("favouritePokemon");
+  const [bottomSheetPokemon, setBottomSheetPokemon] = useState<Pokemon | null>(
+    null,
+  );
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const { data, isLoading, error, hasNextPage, fetchNextPage } =
     useGetPokemons();
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const { data: favouritePokemonData, isLoading: isLoadingFavouritePokemon } =
+    useGetFavouritePokemon(favouritePokemon);
   const onReachEnd = () => {
     if (hasNextPage && !isLoading) {
       fetchNextPage();
     }
   };
-  const { pokemonData, pokemonCount } = useMemo<{
+  const handleOpenBottomSheet = (pokemon: Pokemon) => {
+    bottomSheetRef.current?.present();
+    setBottomSheetPokemon(pokemon);
+  };
+  const handleAddToFavorite = (name: string) => {
+    setFavouritePokemon(name);
+  };
+  const handleRemoveFavorite = () => {
+    setFavouritePokemon(undefined);
+  };
+  const { pokemonData } = useMemo<{
     pokemonData: Pokemon[];
-    pokemonCount: number;
   }>(() => {
     return {
       pokemonData: data?.pages?.flatMap((page) => page.detailedResponse) ?? [],
-      pokemonCount: data?.pages[0].count,
     };
   }, [data]);
+  const {
+    filteredPokemonData,
+    pokemonCount,
+  }: { filteredPokemonData: Pokemon[]; pokemonCount: number } = useMemo(() => {
+    const filteredPokemonData = pokemonData.filter((p) =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+    return {
+      filteredPokemonData,
+      pokemonCount: filteredPokemonData.length,
+    };
+  }, [pokemonData, searchQuery]);
   return (
     <>
       <SafeAreaView
@@ -48,6 +80,13 @@ export default function PokemonList() {
             <SettingsIcon fill={useThemeColor({}, "bgStrongPrimary")} />
           </View>
         </View>
+        {favouritePokemonData && (
+          <FavouritePokemon
+            pokemon={favouritePokemonData}
+            handleRemove={handleRemoveFavorite}
+            handleOpenBottomSheet={handleOpenBottomSheet}
+          />
+        )}
       </SafeAreaView>
       <View
         style={[
@@ -81,26 +120,34 @@ export default function PokemonList() {
           <View
             style={[
               styles.inputContainer,
-              { backgroundColor: useThemeColor({}, "bgSoftPrimary") },
+              {
+                backgroundColor: useThemeColor({}, "bgSoftPrimary"),
+                borderColor: useThemeColor({}, "borderSoft"),
+              },
             ]}
           >
             <Search fill={useThemeColor({}, "textDefaultPrimary")} />
             <TextInput
-              style={[styles.input]}
+              style={[
+                styles.input,
+                { color: useThemeColor({}, "textDefaultPrimary") },
+              ]}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
               placeholder="Search a pokemon..."
               placeholderTextColor={useThemeColor({}, "textDefaultSecondary")}
             />
           </View>
-          {pokemonData ? (
+          {filteredPokemonData ? (
             <FlatList<Pokemon>
-              data={pokemonData}
+              data={filteredPokemonData}
               style={styles.itemsContainer}
               renderItem={({ item, index }) => (
                 <PokemonItem
                   pokemon={item}
-                  index={index}
+                  index={index + 1}
                   onPress={() => {
-                    bottomSheetRef.current?.present();
+                    handleOpenBottomSheet(item);
                   }}
                 />
               )}
@@ -114,7 +161,14 @@ export default function PokemonList() {
           )}
         </View>
       </View>
-      <BottomSheet ref={bottomSheetRef} />
+      <BottomSheet ref={bottomSheetRef}>
+        {bottomSheetPokemon !== null ? (
+          <BottomSheetContent
+            pokemon={bottomSheetPokemon}
+            handleAddToFavorite={handleAddToFavorite}
+          />
+        ) : null}
+      </BottomSheet>
     </>
   );
 }
@@ -128,13 +182,14 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   header: {
-    paddingHorizontal: 20,
     height: 80,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
   },
   safeAreaView: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
   },
@@ -163,6 +218,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     gap: 8,
+    borderWidth: 1,
   },
   input: {},
   itemsContainer: {
