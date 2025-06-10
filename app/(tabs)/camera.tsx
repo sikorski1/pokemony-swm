@@ -1,14 +1,7 @@
-import { Text, View } from "react-native";
-export default function FavouritePokemon() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Favourite Pokemon</Text>
-    </View>
-  );
+import { View, Text } from "react-native"
+import CameraComponent from "@/components/Camera/CameraComponent"
+export default function CameraScreen() {
+    return (
+        <CameraComponent></CameraComponent>
+    )
 }

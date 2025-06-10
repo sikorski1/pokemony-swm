@@ -3,14 +3,23 @@ import BottomSheet from "@/components/BottomSheet";
 import BottomSheetContent from "@/components/BottomSheetContent";
 import Header from "@/components/Header";
 import PokemonItem from "@/components/PokemonItem";
+import Wrapper from "@/components/Wrapper";
 import { useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon } from "@/types/pokemon";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 export default function PokemonList() {
+  const textInput = useRef<TextInput>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [_, setFavouritePokemon] = useMMKVString("favouritePokemon");
   const [bottomSheetPokemon, setBottomSheetPokemon] = useState<Pokemon | null>(
@@ -53,12 +62,7 @@ export default function PokemonList() {
   return (
     <>
       <Header handleOpenBottomSheet={handleOpenBottomSheet} />
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: useThemeColor({}, "bgSoftSecondary") },
-        ]}
-      >
+      <Wrapper>
         <View style={styles.cardsContainer}>
           <View style={styles.pokeTextContainer}>
             <Text
@@ -82,7 +86,8 @@ export default function PokemonList() {
               {pokemonCount || 0} pokemons found
             </Text>
           </View>
-          <View
+          <Pressable
+            onPress={() => textInput.current?.focus()}
             style={[
               styles.inputContainer,
               {
@@ -93,6 +98,7 @@ export default function PokemonList() {
           >
             <Search fill={useThemeColor({}, "textDefaultPrimary")} />
             <TextInput
+              ref={textInput}
               style={[
                 styles.input,
                 { color: useThemeColor({}, "textDefaultPrimary") },
@@ -102,7 +108,7 @@ export default function PokemonList() {
               placeholder="Search a pokemon..."
               placeholderTextColor={useThemeColor({}, "textDefaultSecondary")}
             />
-          </View>
+          </Pressable>
           {filteredPokemonData ? (
             <FlatList<Pokemon>
               data={filteredPokemonData}
@@ -125,7 +131,7 @@ export default function PokemonList() {
             </View>
           )}
         </View>
-      </View>
+      </Wrapper>
       <BottomSheet ref={bottomSheetRef}>
         {bottomSheetPokemon !== null ? (
           <BottomSheetContent
@@ -139,9 +145,6 @@ export default function PokemonList() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   cardsContainer: {
     paddingHorizontal: 16,
     paddingVertical: 24,
@@ -186,8 +189,11 @@ const styles = StyleSheet.create({
     gap: 8,
     borderWidth: 1,
   },
-  input: {},
+  input: {
+    outlineWidth: 0,
+  },
   itemsContainer: {
+    maxHeight: 640,
     marginBottom: 10,
   },
 });

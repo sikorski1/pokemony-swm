@@ -6,16 +6,13 @@ import MapIconSolid from "@/assets/icons/map-solid.svg";
 import MapIcon from "@/assets/icons/map.svg";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Tabs } from "expo-router";
-import { Platform } from "react-native";
-export default function TabLayout() {
+export default function Navigation() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
           backgroundColor: useThemeColor({}, "bgSoftPrimary"),
-          maxWidth: 1200,
-          display: Platform.OS === "web" ? "none" : "flex",
         },
         tabBarActiveTintColor: useThemeColor({}, "textDefaultPrimary"),
         tabBarInactiveTintColor: useThemeColor({}, "textDefaultSecondary"),
