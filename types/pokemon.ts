@@ -14,6 +14,7 @@ export type PokemonStats = {
   name: StatKey;
 };
 export type Pokemon = {
+  id: number;
   name: string;
   image: string;
   types: string[];

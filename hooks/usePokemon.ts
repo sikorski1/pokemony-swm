@@ -16,7 +16,7 @@ const statIndexMap = new Map<StatKey, number>(
 const fetchPokemons = async ({ pageParam = 0 }: { pageParam: number }) => {
   try {
     const response = await axios.get(
-      `https://pokeapi.co/api/v2/pokemon?offset=${pageParam}&limit=${PAGE_SIZE}`,
+      `${process.env.EXPO_PUBLIC_POKEMON_API}/pokemon?offset=${pageParam}&limit=${PAGE_SIZE}`,
     );
     const results = response.data.results;
     const count = response.data.count;
@@ -42,6 +42,7 @@ const fetchPokemons = async ({ pageParam = 0 }: { pageParam: number }) => {
           image,
           types,
           stats,
+          id: response.data.id,
         };
       }),
     );
@@ -54,7 +55,7 @@ const fetchPokemons = async ({ pageParam = 0 }: { pageParam: number }) => {
 const fetchFavouritePokemon = async (pokemonName: string) => {
   try {
     const response = await axios.get(
-      `https://pokeapi.co/api/v2/pokemon/${pokemonName}`,
+      `${process.env.EXPO_PUBLIC_POKEMON_API}/pokemon/${pokemonName}`,
     );
     const name = response.data.forms[0].name;
     const image = response.data.sprites.front_shiny;
@@ -75,6 +76,7 @@ const fetchFavouritePokemon = async (pokemonName: string) => {
       image,
       types,
       stats,
+      id: response.data.id,
     };
   } catch (error) {
     console.error("Error fetching favourite pokemon:", error);

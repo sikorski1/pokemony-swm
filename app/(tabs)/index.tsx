@@ -1,31 +1,24 @@
 import Search from "@/assets/icons/search.svg";
-import SettingsIcon from "@/assets/icons/settings.svg";
-import Logo from "@/assets/images/favicon.svg";
 import BottomSheet from "@/components/BottomSheet";
 import BottomSheetContent from "@/components/BottomSheetContent";
-import FavouritePokemon from "@/components/FavouritePokemon";
+import Header from "@/components/Header";
 import PokemonItem from "@/components/PokemonItem";
-import { useGetFavouritePokemon, useGetPokemons } from "@/hooks/usePokemon";
+import { useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon } from "@/types/pokemon";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-import { SafeAreaView } from "react-native-safe-area-context";
-
 export default function PokemonList() {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const [favouritePokemon, setFavouritePokemon] =
-    useMMKVString("favouritePokemon");
+  const [_, setFavouritePokemon] = useMMKVString("favouritePokemon");
   const [bottomSheetPokemon, setBottomSheetPokemon] = useState<Pokemon | null>(
     null,
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { data, isLoading, error, hasNextPage, fetchNextPage } =
     useGetPokemons();
-  const { data: favouritePokemonData, isLoading: isLoadingFavouritePokemon } =
-    useGetFavouritePokemon(favouritePokemon);
   const onReachEnd = () => {
     if (hasNextPage && !isLoading) {
       fetchNextPage();
@@ -37,9 +30,6 @@ export default function PokemonList() {
   };
   const handleAddToFavorite = (name: string) => {
     setFavouritePokemon(name);
-  };
-  const handleRemoveFavorite = () => {
-    setFavouritePokemon(undefined);
   };
   const { pokemonData } = useMemo<{
     pokemonData: Pokemon[];
@@ -62,32 +52,7 @@ export default function PokemonList() {
   }, [pokemonData, searchQuery]);
   return (
     <>
-      <SafeAreaView
-        style={[
-          styles.safeAreaView,
-          { backgroundColor: useThemeColor({}, "bgSoftPrimary") },
-        ]}
-        edges={["top"]}
-      >
-        <View style={[styles.header, { backgroundColor: "bgSoftPrimary" }]}>
-          <Logo width={110} height={40}></Logo>
-          <View
-            style={[
-              styles.settingsOutline,
-              { backgroundColor: useThemeColor({}, "bgSoftSecondaryHover") },
-            ]}
-          >
-            <SettingsIcon fill={useThemeColor({}, "bgStrongPrimary")} />
-          </View>
-        </View>
-        {favouritePokemonData && (
-          <FavouritePokemon
-            pokemon={favouritePokemonData}
-            handleRemove={handleRemoveFavorite}
-            handleOpenBottomSheet={handleOpenBottomSheet}
-          />
-        )}
-      </SafeAreaView>
+      <Header handleOpenBottomSheet={handleOpenBottomSheet} />
       <View
         style={[
           styles.container,
@@ -216,6 +181,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: 8,
     padding: 16,
+    alignItems: "center",
     borderRadius: 8,
     gap: 8,
     borderWidth: 1,

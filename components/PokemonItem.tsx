@@ -50,7 +50,7 @@ export default function PokemonItem({ pokemon, index, onPress }: Props) {
             { color: useThemeColor({}, "textDefaultTertiary") },
           ]}
         >
-          {index.toString().padStart(3, "0")}
+          {pokemon.id.toString().padStart(3, "0")}
         </Text>
       </View>
       <View style={styles.pokemonTypeBox}>
