@@ -2,15 +2,15 @@ import SettingsIcon from "@/assets/icons/settings.svg";
 import Logo from "@/assets/images/favicon.svg";
 import { useGetFavouritePokemon } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { Pokemon } from "@/types/pokemon";
 import { StyleSheet, View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FavouritePokemon from "./FavouritePokemon";
-import { Pokemon } from "@/types/pokemon";
 type Props = {
-    handleOpenBottomSheet: (pokemon: Pokemon) => void;
-}
-export default function Header({handleOpenBottomSheet}:Props) {
+  handleOpenBottomSheet: (pokemon: Pokemon) => void;
+};
+export default function Header({ handleOpenBottomSheet }: Props) {
   const [favouritePokemon, setFavouritePokemon] =
     useMMKVString("favouritePokemon");
   const { data: favouritePokemonData, isLoading: isLoadingFavouritePokemon } =

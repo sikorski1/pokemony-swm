@@ -2,7 +2,7 @@ import Search from "@/assets/icons/search.svg";
 import BottomSheet from "@/components/BottomSheet";
 import BottomSheetContent from "@/components/BottomSheetContent";
 import Header from "@/components/Header";
-import PokemonItem from "@/components/PokemonItem";
+import PokemonItem from "@/components/PokemonItem/PokemonItem";
 import Wrapper from "@/components/Wrapper";
 import { useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -11,10 +11,12 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMemo, useRef, useState } from "react";
 import {
   FlatList,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  useColorScheme,
   View,
 } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
@@ -28,6 +30,7 @@ export default function PokemonList() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { data, isLoading, error, hasNextPage, fetchNextPage } =
     useGetPokemons();
+  const theme = useColorScheme();
   const onReachEnd = () => {
     if (hasNextPage && !isLoading) {
       fetchNextPage();
@@ -113,13 +116,16 @@ export default function PokemonList() {
             <FlatList<Pokemon>
               data={filteredPokemonData}
               style={styles.itemsContainer}
-              renderItem={({ item, index }) => (
+              numColumns={Platform.OS === "web" ? 4 : 1}
+              contentContainerStyle={{ gap: 16 }}
+              columnWrapperStyle={{ gap: 16 }}
+              renderItem={({ item }) => (
                 <PokemonItem
                   pokemon={item}
-                  index={index + 1}
                   onPress={() => {
                     handleOpenBottomSheet(item);
                   }}
+                  theme={theme || "light"}
                 />
               )}
               onEndReached={onReachEnd}
@@ -143,7 +149,15 @@ export default function PokemonList() {
     </>
   );
 }
-
+const itemsContainerWebStyles = {
+  flex: 4,
+  padding:16,
+  maxHeight: 640,
+};
+const itemsContainerWebMobile = {
+  flex: 1,
+  marginBottom: 10,
+};
 const styles = StyleSheet.create({
   cardsContainer: {
     paddingHorizontal: 16,
@@ -192,8 +206,6 @@ const styles = StyleSheet.create({
   input: {
     outlineWidth: 0,
   },
-  itemsContainer: {
-    maxHeight: 640,
-    marginBottom: 10,
-  },
+  itemsContainer:
+    Platform.OS === "web" ? itemsContainerWebStyles : itemsContainerWebMobile,
 });

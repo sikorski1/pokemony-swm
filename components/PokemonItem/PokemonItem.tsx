@@ -6,10 +6,9 @@ import { Image } from "expo-image";
 import { StyleSheet, Text, useColorScheme, View } from "react-native";
 type Props = {
   pokemon: Pokemon;
-  index: number;
   onPress: () => void;
 };
-export default function PokemonItem({ pokemon, index, onPress }: Props) {
+export default function PokemonItem({ pokemon, onPress }: Props) {
   const theme = useColorScheme();
   return (
     <PlatformPressable
