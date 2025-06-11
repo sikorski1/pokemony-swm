@@ -2,7 +2,7 @@ import Search from "@/assets/icons/search.svg";
 import BottomSheet from "@/components/BottomSheet";
 import BottomSheetContent from "@/components/BottomSheetContent";
 import Header from "@/components/Header";
-import PokemonItem from "@/components/PokemonItem/PokemonItem";
+import PokemonList from "@/components/PokemonList/PokemonList";
 import Wrapper from "@/components/Wrapper";
 import { useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -10,7 +10,6 @@ import { Pokemon } from "@/types/pokemon";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMemo, useRef, useState } from "react";
 import {
-  FlatList,
   Platform,
   Pressable,
   StyleSheet,
@@ -20,10 +19,11 @@ import {
   View,
 } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-export default function PokemonList() {
+export default function Home() {
   const textInput = useRef<TextInput>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const [_, setFavouritePokemon] = useMMKVString("favouritePokemon");
+  const [favouritePokemon, setFavouritePokemon] =
+    useMMKVString("favouritePokemon");
   const [bottomSheetPokemon, setBottomSheetPokemon] = useState<Pokemon | null>(
     null,
   );
@@ -113,23 +113,10 @@ export default function PokemonList() {
             />
           </Pressable>
           {filteredPokemonData ? (
-            <FlatList<Pokemon>
-              data={filteredPokemonData}
-              style={styles.itemsContainer}
-              numColumns={Platform.OS === "web" ? 4 : 1}
-              contentContainerStyle={{ gap: 16 }}
-              columnWrapperStyle={{ gap: 16 }}
-              renderItem={({ item }) => (
-                <PokemonItem
-                  pokemon={item}
-                  onPress={() => {
-                    handleOpenBottomSheet(item);
-                  }}
-                  theme={theme || "light"}
-                />
-              )}
-              onEndReached={onReachEnd}
-              onEndReachedThreshold={0.5}
+            <PokemonList
+              filteredPokemonData={filteredPokemonData}
+              onReachEnd={onReachEnd}
+              handleOpenBottomSheet={handleOpenBottomSheet}
             />
           ) : (
             <View>
@@ -149,19 +136,11 @@ export default function PokemonList() {
     </>
   );
 }
-const itemsContainerWebStyles = {
-  flex: 4,
-  padding:16,
-  maxHeight: 640,
-};
-const itemsContainerWebMobile = {
-  flex: 1,
-  marginBottom: 10,
-};
 const styles = StyleSheet.create({
   cardsContainer: {
+    flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 24,
+    paddingTop:24
   },
   header: {
     height: 80,
@@ -185,7 +164,6 @@ const styles = StyleSheet.create({
     borderRadius: "50%",
   },
   pokeTextContainer: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -206,6 +184,4 @@ const styles = StyleSheet.create({
   input: {
     outlineWidth: 0,
   },
-  itemsContainer:
-    Platform.OS === "web" ? itemsContainerWebStyles : itemsContainerWebMobile,
 });

@@ -16,7 +16,7 @@ export default function Wrapper({ children }: { children: React.ReactNode }) {
 const styles = StyleSheet.create({
   wrapper: {
     maxWidth: 1200,
-    width:"100%",
+    width: "100%",
     alignSelf: "center",
     flex: 1,
   },
