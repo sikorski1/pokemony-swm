@@ -5,17 +5,12 @@ import Speed from "@/assets/icons/speed.svg";
 import { Colors } from "@/constants/Colors";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon, StatKey } from "@/types/pokemon";
+import { PlatformPressable } from "@react-navigation/elements";
 import { Image } from "expo-image";
 import React from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
-import { PlatformPressable } from "@react-navigation/elements";
+import { StyleSheet, Text, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import QrCode from "./QrCode/QrCode";
 type Props = {
   pokemon: Pokemon;
   handleAddToFavorite: (name: string) => void;
@@ -113,6 +108,7 @@ export default function BottomSheetContent({
           Add to favorite
         </Text>
       </PlatformPressable>
+      <QrCode deepLink={`pokemony:///?name=${pokemon.name}`} />
     </SafeAreaView>
   );
 }

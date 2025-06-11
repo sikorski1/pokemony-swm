@@ -5,13 +5,12 @@ import {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { Ref } from "react";
-export default function BottomSheet({
-  ref,
-  children,
-}: {
+type Props = {
   ref: Ref<BottomSheetModal>;
   children: React.ReactNode;
-}) {
+  onDismiss?: () => void;
+};
+export default function BottomSheet({ ref, children, onDismiss }: Props) {
   return (
     <BottomSheetModal
       ref={ref}
@@ -26,6 +25,7 @@ export default function BottomSheet({
       handleIndicatorStyle={{
         backgroundColor: useThemeColor({}, "bgStrongPrimary"),
       }}
+      onDismiss={onDismiss}
     >
       <BottomSheetView
         style={{ backgroundColor: useThemeColor({}, "bgSoftPrimary") }}

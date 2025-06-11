@@ -4,20 +4,13 @@ import BottomSheetContent from "@/components/BottomSheetContent";
 import Header from "@/components/Header";
 import PokemonList from "@/components/PokemonList/PokemonList";
 import Wrapper from "@/components/Wrapper";
-import { useGetPokemons } from "@/hooks/usePokemon";
+import { useGetFavouritePokemon, useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon } from "@/types/pokemon";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useMemo, useRef, useState } from "react";
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  useColorScheme,
-  View,
-} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 export default function Home() {
   const textInput = useRef<TextInput>(null);
@@ -30,7 +23,9 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { data, isLoading, error, hasNextPage, fetchNextPage } =
     useGetPokemons();
-  const theme = useColorScheme();
+  const { name } = useLocalSearchParams();
+  const { data: singlePokemonData } = useGetFavouritePokemon(name as string);
+  const router = useRouter();
   const onReachEnd = () => {
     if (hasNextPage && !isLoading) {
       fetchNextPage();
@@ -40,9 +35,19 @@ export default function Home() {
     bottomSheetRef.current?.present();
     setBottomSheetPokemon(pokemon);
   };
+  const handleCloseBottomSheet = () => {
+    setBottomSheetPokemon(null);
+    router.replace({ pathname: "/", params: {} });
+  };
   const handleAddToFavorite = (name: string) => {
     setFavouritePokemon(name);
   };
+  useEffect(() => {
+    if (singlePokemonData) {
+      setBottomSheetPokemon(singlePokemonData);
+      bottomSheetRef.current?.present();
+    }
+  }, [singlePokemonData]);
   const { pokemonData } = useMemo<{
     pokemonData: Pokemon[];
   }>(() => {
@@ -125,7 +130,7 @@ export default function Home() {
           )}
         </View>
       </Wrapper>
-      <BottomSheet ref={bottomSheetRef}>
+      <BottomSheet ref={bottomSheetRef} onDismiss={handleCloseBottomSheet}>
         {bottomSheetPokemon !== null ? (
           <BottomSheetContent
             pokemon={bottomSheetPokemon}
@@ -140,7 +145,7 @@ const styles = StyleSheet.create({
   cardsContainer: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop:24
+    paddingTop: 24,
   },
   header: {
     height: 80,

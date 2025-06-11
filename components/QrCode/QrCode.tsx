@@ -1,0 +1,8 @@
+import PokemonLogo from "@/assets/images/favicon.svg";
+import QRCode from "react-native-qrcode-svg";
+type Props = {
+  deepLink: string;
+};
+export default function QrCode({ deepLink }: Props) {
+  return <QRCode value={deepLink}></QRCode>;
+}
