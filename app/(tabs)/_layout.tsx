@@ -8,6 +8,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
 export default function TabLayout() {
+  const iconColor = useThemeColor({}, "textDefaultPrimary");
   return (
     <Tabs
       screenOptions={{
@@ -27,17 +28,9 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ focused }) =>
             focused ? (
-              <HomeIconSolid
-                width={24}
-                height={24}
-                fill={useThemeColor({}, "textDefaultPrimary")}
-              />
+              <HomeIconSolid width={24} height={24} fill={iconColor} />
             ) : (
-              <HomeIcon
-                width={24}
-                height={24}
-                fill={useThemeColor({}, "textDefaultPrimary")}
-              />
+              <HomeIcon width={24} height={24} fill={iconColor} />
             ),
         }}
       />
@@ -47,17 +40,9 @@ export default function TabLayout() {
           title: "Camera",
           tabBarIcon: ({ focused }) =>
             focused ? (
-              <CameraIconSolid
-                width={24}
-                height={24}
-                fill={useThemeColor({}, "textDefaultPrimary")}
-              />
+              <CameraIconSolid width={24} height={24} fill={iconColor} />
             ) : (
-              <CameraIcon
-                width={24}
-                height={24}
-                fill={useThemeColor({}, "textDefaultPrimary")}
-              />
+              <CameraIcon width={24} height={24} fill={iconColor} />
             ),
         }}
       />
@@ -67,17 +52,9 @@ export default function TabLayout() {
           title: "Map",
           tabBarIcon: ({ focused }) =>
             focused ? (
-              <MapIconSolid
-                width={24}
-                height={24}
-                fill={useThemeColor({}, "textDefaultPrimary")}
-              />
+              <MapIconSolid width={24} height={24} fill={iconColor} />
             ) : (
-              <MapIcon
-                width={24}
-                height={24}
-                fill={useThemeColor({}, "textDefaultPrimary")}
-              />
+              <MapIcon width={24} height={24} fill={iconColor} />
             ),
         }}
       />

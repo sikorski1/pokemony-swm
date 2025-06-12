@@ -1,10 +1,12 @@
 import Attack from "@/assets/icons/attack.svg";
+import Check from "@/assets/icons/check.svg";
 import Defense from "@/assets/icons/defense.svg";
 import Hp from "@/assets/icons/hp.svg";
 import Speed from "@/assets/icons/speed.svg";
 import { Colors } from "@/constants/Colors";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon, StatKey } from "@/types/pokemon";
+import { storage } from "@/utils/storage";
 import { PlatformPressable } from "@react-navigation/elements";
 import { Image } from "expo-image";
 import React from "react";
@@ -28,9 +30,35 @@ export default function BottomSheetContent({
   handleAddToFavorite,
 }: Props) {
   const theme = useColorScheme();
+  const bgColor = useThemeColor({}, "bgSoftPrimary");
   const textColor = useThemeColor({}, "textDefaultPrimary");
   return (
     <SafeAreaView style={[styles.container]} edges={["bottom"]}>
+      {storage.getString(`location-${pokemon.name}`) && (
+        <View
+          style={[
+            styles.gotchaBox,
+            { backgroundColor: Colors[theme || "light"]["bgGreenPrimary"] },
+          ]}
+        >
+          <Text
+            style={[
+              styles.gotchaText,
+              { color: Colors[theme || "light"]["textContrastPrimary"] },
+            ]}
+          >
+            Gotcha
+          </Text>
+          <View
+            style={[
+              styles.gotchaIconBox,
+              { backgroundColor: Colors[theme || "light"]["bgSoftSecondary"] },
+            ]}
+          >
+            <Check fill={Colors[theme || "light"]["bgGreenPrimary"]} />
+          </View>
+        </View>
+      )}
       <View style={[styles.headerContainer]}>
         <Text style={[styles.headerName, { color: textColor }]}>
           {pokemon.name}
@@ -43,7 +71,10 @@ export default function BottomSheetContent({
               <View
                 style={[
                   styles.headerTypeBox,
-                  { backgroundColor: useThemeColor({}, "bgSoftSecondary") },
+                  {
+                    backgroundColor:
+                      Colors[theme || "light"]["bgSoftSecondary"],
+                  },
                 ]}
                 key={type}
               >
@@ -108,7 +139,9 @@ export default function BottomSheetContent({
           Add to favorite
         </Text>
       </PlatformPressable>
-      <QrCode deepLink={`pokemony:///?name=${pokemon.name}`} />
+      <View style={styles.qrBox}>
+        <QrCode deepLink={`pokemony:///?name=${pokemon.name}`} />
+      </View>
     </SafeAreaView>
   );
 }
@@ -190,5 +223,22 @@ const styles = StyleSheet.create({
   },
   addToFavouritesBtnText: {
     fontSize: 16,
+  },
+  qrBox: {
+    marginTop: 16,
+  },
+  gotchaBox: {
+    padding: 4,
+    position: "absolute",
+    left: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 99999,
+    gap: 4,
+  },
+  gotchaText: { fontWeight: "bold" },
+  gotchaIconBox: {
+    borderRadius: "50%",
   },
 });

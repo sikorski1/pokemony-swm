@@ -21,14 +21,19 @@ export default function BottomSheet({ ref, children, onDismiss }: Props) {
           appearsOnIndex={0}
         />
       )}
-      handleStyle={{ backgroundColor: useThemeColor({}, "bgSoftPrimary") }}
+      handleStyle={{
+        backgroundColor: useThemeColor({}, "bgSoftPrimary"),
+        borderRadius: 16,
+      }}
       handleIndicatorStyle={{
         backgroundColor: useThemeColor({}, "bgStrongPrimary"),
       }}
       onDismiss={onDismiss}
     >
       <BottomSheetView
-        style={{ backgroundColor: useThemeColor({}, "bgSoftPrimary") }}
+        style={{
+          backgroundColor: useThemeColor({}, "bgSoftPrimary"),
+        }}
       >
         {children}
       </BottomSheetView>
