@@ -59,15 +59,17 @@ export default function Home() {
           type: "success",
           text1: `${singlePokemonData.name.charAt(0).toUpperCase() + singlePokemonData.name.slice(1)} saved!`,
         });
-        const pokemonLocation = {
-          name: singlePokemonData.name,
-          lon: location.coords.longitude,
-          lat: location.coords.latitude,
+        const newMarker = {
+          name:
+            singlePokemonData.name.charAt(0).toUpperCase() +
+            singlePokemonData.name.slice(1),
+          longitude: location.coords.longitude,
+          latitude: location.coords.latitude,
         };
-        storage.set(
-          `location-${singlePokemonData.name}`,
-          JSON.stringify(pokemonLocation),
-        );
+        const currentMarkers = storage.getString("markers");
+        const parsed = currentMarkers ? JSON.parse(currentMarkers) : {};
+        parsed[singlePokemonData.name] = newMarker;
+        storage.set("markers", JSON.stringify(parsed));
       }
     },
     [singlePokemonData],
