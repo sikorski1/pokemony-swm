@@ -1,6 +1,6 @@
 import { Markers } from "@/types/map";
 import { Pokemon, PokemonStats, StatKey } from "@/types/pokemon";
-import { useInfiniteQuery, useQueries, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueries, useQuery, UseQueryOptions } from "@tanstack/react-query";
 import axios from "axios";
 const PAGE_SIZE = 30;
 const statOrder: StatKey[] = [
@@ -106,7 +106,7 @@ export const useGetFavouritePokemon = (pokemonName?: string) => {
 };
 
 export const useGetPokemonMarkers = (markers: Markers[]) => {
-  return useQueries({
+  return useQueries<UseQueryOptions<Pokemon>[]>({
     queries: markers.map((markers) => ({
       queryKey: ["markers", markers.name.toLowerCase()],
       queryFn: () => fetchFavouritePokemon(markers.name.toLowerCase()),

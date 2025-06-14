@@ -37,12 +37,17 @@ export default function PokemonMap() {
     }
   }, [rawMarkers]);
   const pokemonMarkersData = useGetPokemonMarkers(markers);
-  const finalMarkers: (Markers & Partial<Pokemon>)[] = useMemo(() => {
+  const finalMarkers: (Markers & Pokemon)[] = useMemo(() => {
     if (!pokemonMarkersData) return [];
-    return markers.map((marker, index) => ({
-      ...pokemonMarkersData[index].data,
-      ...marker,
-    }));
+    return markers
+      .map((marker, index) => {
+        if (!pokemonMarkersData[index].data) return undefined;
+        return {
+          ...pokemonMarkersData[index].data,
+          ...marker,
+        };
+      })
+      .filter((it) => it !== undefined);
   }, [markers, pokemonMarkersData]);
   return (
     <>

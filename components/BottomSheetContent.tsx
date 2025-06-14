@@ -30,11 +30,13 @@ export default function BottomSheetContent({
   handleAddToFavorite,
 }: Props) {
   const theme = useColorScheme();
-  const bgColor = useThemeColor({}, "bgSoftPrimary");
   const textColor = useThemeColor({}, "textDefaultPrimary");
+  const markersRaw = storage.getString("markers");
+  const markers = markersRaw ? JSON.parse(markersRaw) : {};
+  const isCaught = Boolean(markers[pokemon.name]);
   return (
     <SafeAreaView style={[styles.container]} edges={["bottom"]}>
-      {storage.getString(`location-${pokemon.name}`) && (
+      {isCaught && (
         <View
           style={[
             styles.gotchaBox,

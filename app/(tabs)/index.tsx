@@ -109,9 +109,6 @@ export default function Home() {
       pokemonCount: filteredPokemonData.length,
     };
   }, [pokemonData, searchQuery]);
-  useEffect(() => {
-    console.log(storage.getAllKeys());
-  }, []);
   return (
     <>
       <Header handleOpenBottomSheet={handleOpenBottomSheet} />

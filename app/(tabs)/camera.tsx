@@ -1,10 +1,18 @@
 import { PlatformPressable } from "@react-navigation/elements";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
-import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { Linking, StyleSheet, Text, View } from "react-native";
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
+  const [hasScanned, setHasScanned] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      setHasScanned(false);
+    }, []),
+  );
+
   if (!permission) {
     return <View />;
   }
@@ -26,7 +34,18 @@ export default function CameraScreen() {
   }
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}>
+      <CameraView
+        style={styles.camera}
+        onBarcodeScanned={({ data }) => {
+          if (!hasScanned) {
+            setTimeout(async () => {
+              await Linking.openURL(data);
+            }, 500);
+            setHasScanned(true);
+          }
+        }}
+        facing={facing}
+      >
         <View style={styles.buttonContainer}>
           <PlatformPressable style={styles.button} onPress={toggleCameraFacing}>
             <Text style={styles.text}>Flip Camera</Text>
