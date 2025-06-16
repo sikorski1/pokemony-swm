@@ -142,7 +142,7 @@ export default function BottomSheetContent({
         </Text>
       </PlatformPressable>
       <View style={styles.qrBox}>
-        <QrCode deepLink={`pokemony:///?name=${pokemon.name}`} />
+        <QrCode deepLink={`pokemony:///camera?name=${pokemon.name}`} />
       </View>
     </SafeAreaView>
   );

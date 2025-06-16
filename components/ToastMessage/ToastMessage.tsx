@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/Colors";
+import { PlatformPressable } from "@react-navigation/elements";
 import { StyleSheet, Text, useColorScheme, View } from "react-native";
 import Toast from "react-native-toast-message";
-
 export default function ToastMessage() {
   const theme = useColorScheme();
   return (
@@ -71,6 +71,52 @@ export default function ToastMessage() {
             </Text>
           </View>
         ),
+        saveButton: ({ text1, onPress }) => (
+          <View
+            style={[
+              styles.container,
+              {
+                backgroundColor: Colors[theme || "light"]["bgSoftPrimary"],
+                borderColor: Colors[theme || "light"]["borderSoft"],
+                shadowColor:
+                  Colors[theme || "light"]["bgStrongSecondaryClicked"],
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.successStripe,
+                {
+                  backgroundColor: Colors[theme || "light"]["bgOrangePrimary"],
+                },
+              ]}
+            />
+            <Text
+              style={[
+                styles.text1,
+                {
+                  color: Colors[theme || "light"]["textDefaultPrimary"],
+                  flex: 1,
+                },
+              ]}
+            >
+              {text1}
+            </Text>
+            <PlatformPressable onPress={onPress} style={styles.button}>
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: Colors[theme || "light"]["bgOrangePrimary"] },
+                ]}
+              >
+                Catch
+              </Text>
+            </PlatformPressable>
+          </View>
+        ),
       }}
       topOffset={60}
     />
@@ -105,5 +151,12 @@ const styles = StyleSheet.create({
   },
   text2: {
     fontSize: 12,
+  },
+  button: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  buttonText: {
+    fontWeight: "bold",
   },
 });
