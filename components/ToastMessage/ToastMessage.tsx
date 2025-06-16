@@ -105,11 +105,19 @@ export default function ToastMessage() {
             >
               {text1}
             </Text>
-            <PlatformPressable onPress={onPress} style={styles.button}>
+            <PlatformPressable
+              onPress={onPress}
+              style={[
+                styles.button,
+                {
+                  backgroundColor: Colors[theme || "light"]["bgOrangePrimary"],
+                },
+              ]}
+            >
               <Text
                 style={[
                   styles.buttonText,
-                  { color: Colors[theme || "light"]["bgOrangePrimary"] },
+                  { color: Colors[theme || "light"]["textContrastPrimary"] },
                 ]}
               >
                 Catch
@@ -153,8 +161,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   button: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
   },
   buttonText: {
     fontWeight: "bold",

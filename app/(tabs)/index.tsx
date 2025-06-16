@@ -8,7 +8,6 @@ import { useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon } from "@/types/pokemon";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
@@ -22,9 +21,7 @@ export default function Home() {
     null,
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const { data, isLoading, error, hasNextPage, fetchNextPage } =
-    useGetPokemons();
-  const router = useRouter();
+  const { data, isLoading, hasNextPage, fetchNextPage } = useGetPokemons();
   const onReachEnd = () => {
     if (hasNextPage && !isLoading) {
       fetchNextPage();
@@ -36,11 +33,11 @@ export default function Home() {
   };
   const handleCloseBottomSheet = () => {
     setBottomSheetPokemon(null);
-    router.replace({ pathname: "/", params: {} });
   };
   const handleAddToFavorite = (name: string) => {
     setFavouritePokemon(name);
   };
+
   const { pokemonData } = useMemo<{
     pokemonData: Pokemon[];
   }>(() => {
@@ -48,6 +45,7 @@ export default function Home() {
       pokemonData: data?.pages?.flatMap((page) => page.detailedResponse) ?? [],
     };
   }, [data]);
+
   const {
     filteredPokemonData,
     pokemonCount,

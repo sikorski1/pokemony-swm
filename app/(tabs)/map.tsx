@@ -11,12 +11,14 @@ export default function PokemonMap() {
     null,
   );
   const [rawMarkers] = useMMKVString("markers");
+
   const handleGetCurrentLocationOnSuccess = useCallback(
     (location: LocationObject) => {
       setCurrentLocation(location);
     },
     [],
   );
+
   const handleGetCurrentLocationOnError = useCallback(() => {}, []);
   useEffect(() => {
     (async () =>
@@ -25,6 +27,7 @@ export default function PokemonMap() {
         handleOnSuccess: handleGetCurrentLocationOnSuccess,
       }))();
   }, [handleGetCurrentLocationOnSuccess, handleGetCurrentLocationOnError]);
+
   const markers: Markers[] = useMemo(() => {
     if (!rawMarkers) return [];
     try {
@@ -36,6 +39,7 @@ export default function PokemonMap() {
       return [];
     }
   }, [rawMarkers]);
+
   const pokemonMarkersData = useGetPokemonMarkers(markers);
   const finalMarkers: (Markers & Pokemon)[] = useMemo(() => {
     if (!pokemonMarkersData) return [];

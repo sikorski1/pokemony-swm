@@ -32,21 +32,25 @@ export default function CameraScreen() {
   const [cornerPoints, setCornerPoints] = useState<Point[] | null>(null);
   const [isToastVisible, setIsToastVisible] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-  const [favouritePokemon, setFavouritePokemon] =
-    useMMKVString("favouritePokemon");
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const isFocused = useIsFocused();
   const [bottomSheetPokemon, setBottomSheetPokemon] = useState<Pokemon | null>(
     null,
   );
-  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [cornerPointsSize, setCornerPointsSize] =
+    useState<CornerPointsSize | null>(null);
+  const [favouritePokemon, setFavouritePokemon] =
+    useMMKVString("favouritePokemon");
+
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const cornerResetTimeoutRef = useRef<NodeJS.Timeout>(null);
+
+  const isFocused = useIsFocused();
   const router = useRouter();
+  const theme = useColorScheme();
+
   const [permission, requestPermission] = useCameraPermissions();
   const { name } = useLocalSearchParams();
   const { data: singlePokemonData } = useGetFavouritePokemon(name as string);
-  const [cornerPointsSize, setCornerPointsSize] =
-    useState<CornerPointsSize | null>(null);
-  const cornerResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const leftTopStyle = useAnimatedCorner(
     cornerPoints?.[0]?.x,
     cornerPoints?.[0]?.y,
@@ -63,7 +67,7 @@ export default function CameraScreen() {
     cornerPoints?.[3]?.x,
     cornerPoints?.[3]?.y,
   );
-  const theme = useColorScheme();
+  
   const handlePokemonCatch = (pokemonName: string) => {
     Toast.hide();
     setIsToastVisible(false);
@@ -73,9 +77,9 @@ export default function CameraScreen() {
       params: { name: pokemonName },
     });
   };
-  function toggleCameraFacing() {
+  const toggleCameraFacing = () => {
     setFacing((current) => (current === "back" ? "front" : "back"));
-  }
+  };
   const handleShowToast = (params: ToastShowParams) => {
     Toast.show(params);
   };
@@ -174,20 +178,14 @@ export default function CameraScreen() {
                 height: scan.bounds.size.height / 3,
                 opacity: 1,
               });
-              if (toastTimeoutRef.current) {
-                clearTimeout(toastTimeoutRef.current);
-                toastTimeoutRef.current = null;
-              }
               if (!isToastVisible) {
-                toastTimeoutRef.current = setTimeout(() => {
-                  setIsToastVisible(true);
-                  handleShowToast({
-                    type: "saveButton",
-                    onPress: () => handlePokemonCatch(scan.data.split("=")[1]),
-                    text1: "Catch a pokemon!",
-                    onHide: () => setIsToastVisible(false),
-                  });
-                }, 200);
+                setIsToastVisible(true);
+                handleShowToast({
+                  type: "saveButton",
+                  onPress: () => handlePokemonCatch(scan.data.split("=")[1]),
+                  text1: "Catch a pokemon!",
+                  onHide: () => setIsToastVisible(false),
+                });
               }
             }
           }}
