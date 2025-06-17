@@ -166,95 +166,97 @@ export default function CameraScreen() {
   return (
     <>
       <View style={styles.container}>
-        <CameraView
-          onAvailableLensesChanged={({ lenses }) => setLenses(lenses)}
-          selectedLens={lenses[0]}
-          zoom={0}
-          style={styles.camera}
-          onBarcodeScanned={(scan) => {
-            if (!isBottomSheetOpen && isFocused) {
-              setCornerPoints(scan.cornerPoints);
-              setCornerPointsSize({
-                width: scan.bounds.size.width / 3,
-                height: scan.bounds.size.height / 3,
-                opacity: 1,
-              });
-              if (!isToastVisible) {
-                setIsToastVisible(true);
-                handleShowToast({
-                  type: "saveButton",
-                  onPress: () => handlePokemonCatch(scan.data.split("=")[1]),
-                  text1: "Catch a pokemon!",
-                  onHide: () => setIsToastVisible(false),
+        {isFocused && (
+          <CameraView
+            onAvailableLensesChanged={({ lenses }) => setLenses(lenses)}
+            selectedLens={lenses[0]}
+            zoom={0}
+            style={styles.camera}
+            onBarcodeScanned={(scan) => {
+              if (!isBottomSheetOpen && isFocused) {
+                setCornerPoints(scan.cornerPoints);
+                setCornerPointsSize({
+                  width: scan.bounds.size.width / 3,
+                  height: scan.bounds.size.height / 3,
+                  opacity: 1,
                 });
+                if (!isToastVisible) {
+                  setIsToastVisible(true);
+                  handleShowToast({
+                    type: "saveButton",
+                    onPress: () => handlePokemonCatch(scan.data.split("=")[1]),
+                    text1: "Catch a pokemon!",
+                    onHide: () => setIsToastVisible(false),
+                  });
+                }
               }
-            }
-          }}
-          facing={facing}
-        >
-          <View style={styles.buttonContainer}>
-            <PlatformPressable
-              style={styles.button}
-              onPress={toggleCameraFacing}
-            >
-              <Text style={styles.text}>Flip Camera</Text>
-            </PlatformPressable>
-          </View>
-          <Animated.View
-            style={[
-              {
-                borderLeftWidth: 2,
-                borderTopWidth: 2,
-                borderColor: Colors[theme ?? "light"]["bgRedPrimary"],
-              },
-              styles.corner,
-              cornerPointsSize,
-              leftTopStyle,
-            ]}
-          />
-          <Animated.View
-            style={[
-              {
-                borderLeftWidth: 2,
-                borderBottomWidth: 2,
-                transform: [{ translateY: -(cornerPointsSize?.height || 0) }],
-                borderColor: Colors[theme ?? "light"]["bgRedPrimary"],
-              },
-              styles.corner,
-              leftBottomStyle,
-              cornerPointsSize,
-            ]}
-          />
-          <Animated.View
-            style={[
-              {
-                borderRightWidth: 2,
-                borderBottomWidth: 2,
-                transform: [
-                  { translateX: -(cornerPointsSize?.width || 0) },
-                  { translateY: -(cornerPointsSize?.height || 0) },
-                ],
-                borderColor: Colors[theme ?? "light"]["bgRedPrimary"],
-              },
-              styles.corner,
-              cornerPointsSize,
-              rightBottomStyle,
-            ]}
-          />
-          <Animated.View
-            style={[
-              {
-                borderTopWidth: 2,
-                borderRightWidth: 2,
-                transform: [{ translateX: -(cornerPointsSize?.width || 0) }],
-                borderColor: Colors[theme ?? "light"]["bgRedPrimary"],
-              },
-              styles.corner,
-              cornerPointsSize,
-              rightTopStyle,
-            ]}
-          />
-        </CameraView>
+            }}
+            facing={facing}
+          >
+            <View style={styles.buttonContainer}>
+              <PlatformPressable
+                style={styles.button}
+                onPress={toggleCameraFacing}
+              >
+                <Text style={styles.text}>Flip Camera</Text>
+              </PlatformPressable>
+            </View>
+            <Animated.View
+              style={[
+                {
+                  borderLeftWidth: 2,
+                  borderTopWidth: 2,
+                  borderColor: Colors[theme ?? "light"]["bgRedPrimary"],
+                },
+                styles.corner,
+                cornerPointsSize,
+                leftTopStyle,
+              ]}
+            />
+            <Animated.View
+              style={[
+                {
+                  borderLeftWidth: 2,
+                  borderBottomWidth: 2,
+                  transform: [{ translateY: -(cornerPointsSize?.height || 0) }],
+                  borderColor: Colors[theme ?? "light"]["bgRedPrimary"],
+                },
+                styles.corner,
+                leftBottomStyle,
+                cornerPointsSize,
+              ]}
+            />
+            <Animated.View
+              style={[
+                {
+                  borderRightWidth: 2,
+                  borderBottomWidth: 2,
+                  transform: [
+                    { translateX: -(cornerPointsSize?.width || 0) },
+                    { translateY: -(cornerPointsSize?.height || 0) },
+                  ],
+                  borderColor: Colors[theme ?? "light"]["bgRedPrimary"],
+                },
+                styles.corner,
+                cornerPointsSize,
+                rightBottomStyle,
+              ]}
+            />
+            <Animated.View
+              style={[
+                {
+                  borderTopWidth: 2,
+                  borderRightWidth: 2,
+                  transform: [{ translateX: -(cornerPointsSize?.width || 0) }],
+                  borderColor: Colors[theme ?? "light"]["bgRedPrimary"],
+                },
+                styles.corner,
+                cornerPointsSize,
+                rightTopStyle,
+              ]}
+            />
+          </CameraView>
+        )}
       </View>
       <BottomSheet ref={bottomSheetRef} onDismiss={handleCloseBottomSheet}>
         {bottomSheetPokemon !== null ? (

@@ -57,6 +57,14 @@
           "requestLocationPermission": true,
           "locationPermission": "Allow $(PRODUCT_NAME) to use your location"
         }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "pokemony",
+          "organization": "envini"
+        }
       ]
     ],
     "experiments": {
