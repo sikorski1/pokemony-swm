@@ -32,6 +32,7 @@ export default function CameraScreen() {
   const [cornerPoints, setCornerPoints] = useState<Point[] | null>(null);
   const [isToastVisible, setIsToastVisible] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [lenses, setLenses] = useState<string[]>([]);
   const [bottomSheetPokemon, setBottomSheetPokemon] = useState<Pokemon | null>(
     null,
   );
@@ -50,7 +51,6 @@ export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const { name } = useLocalSearchParams();
   const { data: singlePokemonData } = useGetFavouritePokemon(name as string);
-
   const leftTopStyle = useAnimatedCorner(
     cornerPoints?.[0]?.x,
     cornerPoints?.[0]?.y,
@@ -67,7 +67,7 @@ export default function CameraScreen() {
     cornerPoints?.[3]?.x,
     cornerPoints?.[3]?.y,
   );
-  
+
   const handlePokemonCatch = (pokemonName: string) => {
     Toast.hide();
     setIsToastVisible(false);
@@ -131,7 +131,6 @@ export default function CameraScreen() {
         handleOnSuccess: handleGetCurrentLocationOnSuccess,
       }))();
   }, [handleGetCurrentLocationOnSuccess, handleGetCurrentLocationOnError]);
-
   useEffect(() => {
     if (!cornerPoints) return;
 
@@ -152,7 +151,6 @@ export default function CameraScreen() {
   if (!permission) {
     return <View />;
   }
-
   if (!permission.granted) {
     return (
       <View style={styles.container}>
@@ -169,6 +167,9 @@ export default function CameraScreen() {
     <>
       <View style={styles.container}>
         <CameraView
+          onAvailableLensesChanged={({ lenses }) => setLenses(lenses)}
+          selectedLens={lenses[0]}
+          zoom={0}
           style={styles.camera}
           onBarcodeScanned={(scan) => {
             if (!isBottomSheetOpen && isFocused) {

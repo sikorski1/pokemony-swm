@@ -161,8 +161,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   button: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 8,
   },
   buttonText: {
