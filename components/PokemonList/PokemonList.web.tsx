@@ -1,9 +1,9 @@
-import { Pokemon } from "@/types/pokemon";
+import { BottomSheetType, Pokemon } from "@/types/pokemon";
 import { FlatList, StyleSheet, useColorScheme } from "react-native";
 import PokemonItem from "../PokemonItem/PokemonItem.web";
 type Props = {
   filteredPokemonData: Pokemon[];
-  handleOpenBottomSheet: (pokemon: Pokemon) => void;
+  handleOpenBottomSheet: (pokemon: Pokemon, type: BottomSheetType) => void;
   onReachEnd: () => void;
 };
 export default function PokemonList({
@@ -23,7 +23,7 @@ export default function PokemonList({
         <PokemonItem
           pokemon={item}
           onPress={() => {
-            handleOpenBottomSheet(item);
+            handleOpenBottomSheet(item, "singlePokemon");
           }}
           theme={theme || "light"}
         />

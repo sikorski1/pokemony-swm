@@ -1,6 +1,6 @@
 import Heart from "@/assets/icons/heart-solid.svg";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { Pokemon } from "@/types/pokemon";
+import { BottomSheetType, Pokemon } from "@/types/pokemon";
 import { PlatformPressable } from "@react-navigation/elements";
 import { Image } from "expo-image";
 import { StyleSheet, Text, View } from "react-native";
@@ -8,7 +8,7 @@ import { StyleSheet, Text, View } from "react-native";
 type Props = {
   pokemon: Pokemon;
   handleRemove: () => void;
-  handleOpenBottomSheet: (pokemon: Pokemon) => void;
+  handleOpenBottomSheet: (pokemon: Pokemon, type: BottomSheetType) => void;
 };
 export default function FavouritePokemon({
   pokemon,
@@ -75,7 +75,7 @@ export default function FavouritePokemon({
               backgroundColor: useThemeColor({}, "bgStrongPrimary"),
             },
           ]}
-          onPress={() => handleOpenBottomSheet(pokemon)}
+          onPress={() => handleOpenBottomSheet(pokemon, "singlePokemon")}
         >
           <Text
             style={[

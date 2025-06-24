@@ -2,24 +2,16 @@ import Search from "@/assets/icons/search.svg";
 import BottomSheet from "@/components/BottomSheet";
 import BottomSheetContent from "@/components/BottomSheetContent";
 import Header from "@/components/Header";
+import PokemonChat from "@/components/PokemonChat/PokemonChat";
 import PokemonList from "@/components/PokemonList/PokemonList";
 import Wrapper from "@/components/Wrapper";
 import { useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { Pokemon } from "@/types/pokemon";
+import { BottomSheetType, Pokemon } from "@/types/pokemon";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import * as Sentry from "@sentry/react-native";
 import { useMemo, useRef, useState } from "react";
-import {
-  Button,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-
 export default function Home() {
   const textInput = useRef<TextInput>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -28,6 +20,7 @@ export default function Home() {
   const [bottomSheetPokemon, setBottomSheetPokemon] = useState<Pokemon | null>(
     null,
   );
+  const [bottomSheetType, setBottomSheetType] = useState<BottomSheetType>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { data, isLoading, hasNextPage, fetchNextPage } = useGetPokemons();
   const onReachEnd = () => {
@@ -35,9 +28,10 @@ export default function Home() {
       fetchNextPage();
     }
   };
-  const handleOpenBottomSheet = (pokemon: Pokemon) => {
+  const handleOpenBottomSheet = (pokemon: Pokemon, type: BottomSheetType) => {
     bottomSheetRef.current?.present();
     setBottomSheetPokemon(pokemon);
+    setBottomSheetType(type);
   };
   const handleCloseBottomSheet = () => {
     setBottomSheetPokemon(null);
@@ -130,11 +124,14 @@ export default function Home() {
         </View>
       </Wrapper>
       <BottomSheet ref={bottomSheetRef} onDismiss={handleCloseBottomSheet}>
-        {bottomSheetPokemon !== null ? (
+        {bottomSheetType === "singlePokemon" && bottomSheetPokemon !== null ? (
           <BottomSheetContent
             pokemon={bottomSheetPokemon}
             handleAddToFavorite={handleAddToFavorite}
           />
+        ) : null}
+        {bottomSheetType === "chat" && bottomSheetPokemon !== null ? (
+          <PokemonChat pokemon={bottomSheetPokemon} />
         ) : null}
       </BottomSheet>
     </>

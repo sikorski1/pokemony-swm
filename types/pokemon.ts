@@ -20,3 +20,5 @@ export type Pokemon = {
   types: string[];
   stats: PokemonStats[];
 };
+
+export type BottomSheetType = "chat" | "singlePokemon" | null;

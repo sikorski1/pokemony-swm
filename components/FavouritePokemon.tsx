@@ -1,14 +1,14 @@
 import Heart from "@/assets/icons/heart-solid.svg";
+import Chat from "@/assets/icons/message.svg";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { Pokemon } from "@/types/pokemon";
+import { BottomSheetType, Pokemon } from "@/types/pokemon";
 import { PlatformPressable } from "@react-navigation/elements";
 import { Image } from "expo-image";
 import { StyleSheet, Text, View } from "react-native";
-
 type Props = {
   pokemon: Pokemon;
   handleRemove: () => void;
-  handleOpenBottomSheet: (pokemon: Pokemon) => void;
+  handleOpenBottomSheet: (pokemon: Pokemon, type: BottomSheetType) => void;
 };
 export default function FavouritePokemon({
   pokemon,
@@ -75,7 +75,7 @@ export default function FavouritePokemon({
               backgroundColor: useThemeColor({}, "bgStrongPrimary"),
             },
           ]}
-          onPress={() => handleOpenBottomSheet(pokemon)}
+          onPress={() => handleOpenBottomSheet(pokemon, "singlePokemon")}
         >
           <Text
             style={[
@@ -103,12 +103,26 @@ export default function FavouritePokemon({
           </Text>
         </PlatformPressable>
       </View>
+      <PlatformPressable
+        style={[
+          styles.chatBtnBox,
+          { backgroundColor: useThemeColor({}, "bgStrongSecondary") },
+        ]}
+        onPress={() => handleOpenBottomSheet(pokemon, "chat")}
+      >
+        <Chat
+          width={24}
+          height={24}
+          fill={useThemeColor({}, "textDefaultPrimary")}
+        />
+      </PlatformPressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    position: "relative",
     padding: 16,
     gap: 16,
     borderWidth: 1,
@@ -167,5 +181,12 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: "bold",
+  },
+  chatBtnBox: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 12,
+    borderRadius: 9999,
   },
 });
