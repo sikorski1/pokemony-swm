@@ -26,6 +26,7 @@ export default function PokemonList({
         />
       )}
       onEndReached={onReachEnd}
+      keyExtractor={(item) => item.id.toString()}
       onEndReachedThreshold={0.5}
     />
   );

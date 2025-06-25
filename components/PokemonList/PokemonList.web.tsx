@@ -28,6 +28,7 @@ export default function PokemonList({
           theme={theme || "light"}
         />
       )}
+      keyExtractor={(item) => item.id.toString()}
       onEndReached={onReachEnd}
       onEndReachedThreshold={0.5}
     />

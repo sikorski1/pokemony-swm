@@ -1,32 +1,114 @@
-import { Colors } from "@/constants/Colors";
+import RightArrow from "@/assets/icons/arrow-right.svg";
+import { Colors, ThemeColorKey } from "@/constants/Colors";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon } from "@/types/pokemon";
+import { PlatformPressable } from "@react-navigation/elements";
 import { Image } from "expo-image";
-import { StyleSheet, Text, useColorScheme, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  useColorScheme,
+  View,
+} from "react-native";
+import {
+  LLAMA3_2_1B,
+  LLAMA3_2_TOKENIZER,
+  LLAMA3_2_TOKENIZER_CONFIG,
+  LLMTool,
+  MessageRole,
+  useLLM,
+} from "react-native-executorch";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ChatMessage from "../ChatMessage/ChatMessage";
+import TypingIndicator from "../TypingIndicator/TypingIndicator";
 type Props = {
   pokemon: Pokemon;
 };
-type ChatMessage = {
-  sender: "user" | "pokemon";
-  message: string;
+type ChatMessageType = {
+  id: string;
+  role?: MessageRole;
+  content?: string;
 };
-const sampleMessages: ChatMessage[] = [
-  { sender: "user", message: "Hej Pikachu! Jak się dziś czujesz?" },
-  { sender: "pokemon", message: "Pika pika! ⚡️ Dzisiaj mam dużo energii!" },
-  { sender: "user", message: "Gotowy na walkę?" },
-  { sender: "pokemon", message: "Pika! Zawsze jestem gotowy!" },
-  { sender: "user", message: "Kto był Twoim najtrudniejszym przeciwnikiem?" },
-  { sender: "pokemon", message: "Pika... Charizard był naprawdę silny!" },
-  { sender: "user", message: "Wow, brzmi poważnie. Dzięki za rozmowę!" },
-  { sender: "pokemon", message: "Pika pika! ⚡️ Zawsze do usług!" },
+
+const TOOL_DEFINITIONS: LLMTool[] = [
+  {
+    name: "get_pokemon_stats",
+    description: "Returns base starts for a given Pokemon.",
+    parameters: {
+      type: "dict",
+      properties: {
+        name: {
+          type: "string",
+          description: "The name of the Pokémon",
+        },
+      },
+      required: ["name"],
+    },
+  },
 ];
 export default function PokemonChat({ pokemon }: Props) {
+  console.log(pokemon);
+  const flatListRef = useRef<FlatList>(null);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [messageText, setMessageText] = useState<string>("");
+  const llm = useLLM({
+    modelSource: LLAMA3_2_1B,
+    tokenizerSource: LLAMA3_2_TOKENIZER,
+    tokenizerConfigSource: LLAMA3_2_TOKENIZER_CONFIG,
+  });
+
   const theme = useColorScheme();
+  const colorType = ("type" +
+    pokemon.types[0].charAt(0).toUpperCase() +
+    pokemon.types[0].slice(1)) as ThemeColorKey;
+  const displayedMessages = llm.isGenerating
+    ? [...messages, { id: "typing", type: "typing" }]
+    : messages;
+  const handleMessageSend = async (value: Omit<ChatMessageType, "id">) => {
+    if (llm.isReady) {
+      await llm.sendMessage(value.content!);
+    }
+  };
+  useEffect(() => {
+    llm.configure({
+      chatConfig: {
+        systemPrompt: `You are a Pokémon named ${pokemon.name}.
+        You are a ${pokemon.types.join(" and ")}-type Pokémon.
+        Your base stats are:
+        - HP: ${pokemon.stats[0].base_stat}
+        - Attack: ${pokemon.stats[2].base_stat}
+        - Defense: ${pokemon.stats[4].base_stat}
+        - Speed: ${pokemon.stats[1].base_stat}
+        Stay in character and speak like a Pokémon.`,
+      },
+    });
+  }, []);
+  useEffect(() => {
+    const response = llm.messageHistory.at(-1);
+    if (response) {
+      const newMessage: ChatMessageType = {
+        id: Date.now().toString(),
+        ...response,
+      };
+      setMessages((prev) => [...prev, newMessage]);
+      if (newMessage.role === "user") setMessageText("");
+    }
+  }, [llm.messageHistory]);
+  useEffect(() => {
+    flatListRef.current?.scrollToEnd({ animated: true });
+  }, [messages]);
   return (
     <SafeAreaView style={[styles.container]} edges={["bottom"]}>
-      <View style={[styles.headerContainer]}>
+      <View
+        style={[
+          styles.headerContainer,
+          { borderBottomColor: useThemeColor({}, "borderSoft") },
+        ]}
+      >
         <View
           style={[
             styles.imageBox,
@@ -43,34 +125,82 @@ export default function PokemonChat({ pokemon }: Props) {
         <Text
           style={[
             styles.pokemonName,
-            { color: useThemeColor({}, "textDefaultPrimary") },
+            { color: Colors[theme || "light"][colorType as ThemeColorKey] },
           ]}
         >
           {pokemon.name}
         </Text>
       </View>
-      <ScrollView style={[styles.chatContainer]}>
-        {sampleMessages.map((msg, index) => (
-          <View
-            key={index}
+      {messages.length !== 0 ? (
+        <>
+          <FlatList
+            ref={flatListRef}
+            style={[styles.chatContainer]}
+            data={displayedMessages}
+            renderItem={({ item }) => {
+              if (item.type === "typing") {
+                return (
+                  <View style={{ marginBottom: 8 }}>
+                    <TypingIndicator pokemonType={colorType} />
+                  </View>
+                );
+              }
+
+              return (
+                <ChatMessage
+                  message={item}
+                  theme={theme || "light"}
+                  pokemonBoxColor={colorType as ThemeColorKey}
+                />
+              );
+            }}
+            keyExtractor={(item) => item.id}
+          />
+        </>
+      ) : (
+        <View style={[styles.firstMessageBox]}>
+          <Text style={[styles.firstMessage]}>Say hello to </Text>
+          <Text
             style={[
-              styles.messageBubble,
-              msg.sender === "user" ? styles.userBubble : styles.pokemonBubble,
+              styles.firstMessagePokemonName,
+              { color: Colors[theme || "light"][colorType] },
             ]}
           >
-            <Text
-              style={[
-                styles.messageText,
-                {
-                  color: Colors[theme || "light"]["textDefaultPrimary"],
-                },
-              ]}
-            >
-              {msg.message}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
+            {pokemon.name}
+          </Text>
+        </View>
+      )}
+      <View
+        style={[
+          styles.textInputBox,
+          { borderTopColor: useThemeColor({}, "borderSoft") },
+        ]}
+      >
+        <TextInput
+          style={[
+            styles.messageInput,
+            { color: useThemeColor({}, "textDefaultPrimary") },
+            { backgroundColor: useThemeColor({}, "bgSoftSecondaryClicked") },
+          ]}
+          value={messageText}
+          onChangeText={setMessageText}
+          placeholder="Message"
+          placeholderTextColor={useThemeColor({}, "textDefaultSecondary")}
+        />
+        <PlatformPressable
+          onPress={() =>
+            handleMessageSend({ role: "user", content: messageText })
+          }
+          disabled={messageText.trim() === "" || !llm.isReady}
+        >
+          <RightArrow
+            width={28}
+            height={28}
+            fill={useThemeColor({}, colorType)}
+          />
+        </PlatformPressable>
+      </View>
+      {!llm.isReady && <ActivityIndicator />}
     </SafeAreaView>
   );
 }
@@ -79,16 +209,16 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 24,
-    gap: 16,
   },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
+    width: "100%",
     paddingVertical: 8,
     paddingHorizontal: 12,
     gap: 12,
+    borderBottomWidth: 1,
   },
   imageBox: {
     width: 60,
@@ -109,24 +239,33 @@ const styles = StyleSheet.create({
   chatContainer: {
     width: "100%",
     maxHeight: 600,
+    minHeight: 200,
   },
-  messageBubble: {
-    padding: 10,
-    marginVertical: 4,
-    maxWidth: "80%",
-    borderRadius: 16,
+  textInputBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    width: "100%",
+    borderTopWidth: 1,
+    gap: 12,
   },
-  userBubble: {
-    backgroundColor: "#d0f0ff",
-    alignSelf: "flex-end",
-    borderTopRightRadius: 0,
+  messageInput: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 9999,
   },
-  pokemonBubble: {
-    backgroundColor: "#ffe7b3",
-    alignSelf: "flex-start",
-    borderTopLeftRadius: 0,
+  firstMessageBox: {
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  messageText: {
-    fontSize: 14,
+  firstMessage: {
+    fontSize: 20,
+  },
+  firstMessagePokemonName: {
+    fontSize: 30,
+    fontWeight: "bold",
+    textTransform: "uppercase",
   },
 });
