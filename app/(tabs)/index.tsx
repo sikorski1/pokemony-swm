@@ -1,10 +1,10 @@
 import Search from "@/assets/icons/search.svg";
 import BottomSheet from "@/components/BottomSheet";
 import BottomSheetContent from "@/components/BottomSheetContent";
-import Header from "@/components/Header";
+import HomeHeader from "@/components/HomeHeader";
+import HomeMainSectionWrapper from "@/components/HomeMainSectionWrapper";
 import PokemonChat from "@/components/PokemonChat/PokemonChat";
 import PokemonList from "@/components/PokemonList/PokemonList";
-import Wrapper from "@/components/Wrapper";
 import { useGetPokemons } from "@/hooks/usePokemon";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { BottomSheetType, Pokemon } from "@/types/pokemon";
@@ -61,9 +61,11 @@ export default function Home() {
     };
   }, [pokemonData, searchQuery]);
   return (
-    <>
-      <Header handleOpenBottomSheet={handleOpenBottomSheet} />
-      <Wrapper>
+    <View
+      style={{ flex: 1, backgroundColor: useThemeColor({}, "bgSoftPrimary") }}
+    >
+      <HomeHeader handleOpenBottomSheet={handleOpenBottomSheet} />
+      <HomeMainSectionWrapper>
         <View style={styles.cardsContainer}>
           <View style={styles.pokeTextContainer}>
             <Text
@@ -122,7 +124,7 @@ export default function Home() {
             </View>
           )}
         </View>
-      </Wrapper>
+      </HomeMainSectionWrapper>
       <BottomSheet ref={bottomSheetRef} onDismiss={handleCloseBottomSheet}>
         {bottomSheetType === "singlePokemon" && bottomSheetPokemon !== null ? (
           <BottomSheetContent
@@ -134,7 +136,7 @@ export default function Home() {
           <PokemonChat pokemon={bottomSheetPokemon} />
         ) : null}
       </BottomSheet>
-    </>
+    </View>
   );
 }
 const styles = StyleSheet.create({

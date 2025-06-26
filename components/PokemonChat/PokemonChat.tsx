@@ -3,15 +3,16 @@ import { Colors, ThemeColorKey } from "@/constants/Colors";
 import { useLLMInstance } from "@/context/LlmProvider";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pokemon } from "@/types/pokemon";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { PlatformPressable } from "@react-navigation/elements";
 import { Image } from "expo-image";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Keyboard,
   StyleSheet,
   Text,
-  TextInput,
   useColorScheme,
   View,
 } from "react-native";
@@ -38,6 +39,7 @@ export default function PokemonChat({ pokemon }: Props) {
   const handleMessageSend = async (value: Omit<ChatMessageType, "id">) => {
     if (llm && llm.isReady && value.content) {
       setMessageText("");
+      Keyboard.dismiss();
       await llm.sendMessage(value.content);
     }
   };
@@ -81,7 +83,7 @@ export default function PokemonChat({ pokemon }: Props) {
           { borderTopColor: useThemeColor({}, "borderSoft") },
         ]}
       >
-        <TextInput
+        <BottomSheetTextInput
           style={[
             styles.messageInput,
             { color: useThemeColor({}, "textDefaultPrimary") },
@@ -96,7 +98,9 @@ export default function PokemonChat({ pokemon }: Props) {
           onPress={() =>
             handleMessageSend({ role: "user", content: messageText })
           }
-          disabled={messageText.trim() === "" || !llm?.isReady}
+          disabled={
+            messageText.trim() === "" || !llm?.isReady || llm?.isGenerating
+          }
         >
           <RightArrow
             width={28}

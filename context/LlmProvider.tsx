@@ -42,10 +42,8 @@ export const LLMProvider = ({ children }: { children: ReactNode }) => {
   const [configuredPokemon, setConfiguredPokemon] = useState<string | null>(
     null,
   );
-
   const configurePokemon = (pokemon: Pokemon) => {
     if (configuredPokemon === pokemon.name || !llm?.configure) return;
-    console.log(pokemon);
     llm.configure({
       chatConfig: {
         systemPrompt: `You are a Pokémon named ${pokemon.name}.

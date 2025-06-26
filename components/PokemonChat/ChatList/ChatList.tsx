@@ -35,6 +35,8 @@ export default function ChatList({ pokemon }: Props) {
       ref={flatListRef}
       style={[styles.chatContainer]}
       data={displayedMessages}
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
       renderItem={({ item }) => {
         if (item.role === "typing") {
           return (
@@ -55,7 +57,14 @@ export default function ChatList({ pokemon }: Props) {
     />
   ) : (
     <View style={[styles.firstMessageBox]}>
-      <Text style={[styles.firstMessage]}>Say hello to </Text>
+      <Text
+        style={[
+          styles.firstMessage,
+          { color: Colors[theme || "light"]["textDefaultPrimary"] },
+        ]}
+      >
+        Say hello to{" "}
+      </Text>
       <Text
         style={[
           styles.firstMessagePokemonName,

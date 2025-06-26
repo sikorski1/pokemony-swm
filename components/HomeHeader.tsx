@@ -10,7 +10,7 @@ import FavouritePokemon from "./FavouritePokemon";
 type Props = {
   handleOpenBottomSheet: (pokemon: Pokemon, type: BottomSheetType) => void;
 };
-export default function Header({ handleOpenBottomSheet }: Props) {
+export default function HomeHeader({ handleOpenBottomSheet }: Props) {
   const [favouritePokemon, setFavouritePokemon] =
     useMMKVString("favouritePokemon");
   const { data: favouritePokemonData, isLoading: isLoadingFavouritePokemon } =

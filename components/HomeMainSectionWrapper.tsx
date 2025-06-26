@@ -1,6 +1,6 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { StyleSheet, View } from "react-native";
-export default function Wrapper({ children }: { children: React.ReactNode }) {
+export default function HomeMainSectionWrapper({ children }: { children: React.ReactNode }) {
   return (
     <View
       style={[

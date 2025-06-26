@@ -23,7 +23,8 @@ export default function BottomSheet({ ref, children, onDismiss }: Props) {
       )}
       handleStyle={{
         backgroundColor: useThemeColor({}, "bgSoftPrimary"),
-        borderRadius: 16,
+        borderTopEndRadius: 12,
+        borderTopStartRadius: 12,
       }}
       handleIndicatorStyle={{
         backgroundColor: useThemeColor({}, "bgStrongPrimary"),
