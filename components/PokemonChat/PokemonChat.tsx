@@ -40,7 +40,11 @@ export default function PokemonChat({ pokemon }: Props) {
     if (llm && llm.isReady && value.content) {
       setMessageText("");
       Keyboard.dismiss();
-      await llm.sendMessage(value.content);
+      try {
+        await llm.sendMessage(value.content);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   useEffect(() => {
