@@ -1,4 +1,5 @@
 import ToastMessage from "@/components/ToastMessage/ToastMessage";
+import { LLMProvider } from "@/context/LlmProvider";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import * as Sentry from "@sentry/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,16 +27,18 @@ const queryClient = new QueryClient();
 export default Sentry.wrap(function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <BottomSheetModalProvider>
-          <Stack>
-            <Stack.Screen
-              name="(tabs)"
-              options={{ headerShown: false, animation: "slide_from_left" }}
-            />
-          </Stack>
-        </BottomSheetModalProvider>
-      </GestureHandlerRootView>
+      <LLMProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <BottomSheetModalProvider>
+            <Stack>
+              <Stack.Screen
+                name="(tabs)"
+                options={{ headerShown: false, animation: "slide_from_left" }}
+              />
+            </Stack>
+          </BottomSheetModalProvider>
+        </GestureHandlerRootView>
+      </LLMProvider>
       <ToastMessage />
     </QueryClientProvider>
   );
