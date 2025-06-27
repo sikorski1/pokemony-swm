@@ -37,9 +37,9 @@ export default function PokemonChat({ pokemon }: Props) {
     pokemon.types[0].charAt(0).toUpperCase() +
     pokemon.types[0].slice(1)) as ThemeColorKey;
   const handleMessageSend = async (value: Omit<ChatMessageType, "id">) => {
+    setMessageText("");
+    Keyboard.dismiss();
     if (llm && llm.isReady && value.content) {
-      setMessageText("");
-      Keyboard.dismiss();
       try {
         await llm.sendMessage(value.content);
       } catch (error) {

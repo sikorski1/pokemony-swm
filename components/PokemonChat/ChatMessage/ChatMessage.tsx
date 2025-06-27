@@ -1,6 +1,7 @@
 import { Colors, ThemeColorKey } from "@/constants/Colors";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { MessageRole } from "react-native-executorch";
+import Animated, { SlideInDown } from "react-native-reanimated";
 type Props = {
   message: { id: string; role?: MessageRole; content?: string };
   theme: "dark" | "light";
@@ -12,7 +13,8 @@ export default function ChatMessage({
   pokemonBoxColor,
 }: Props) {
   return (
-    <View
+    <Animated.View
+      entering={SlideInDown.duration(200).springify().damping(60).mass(1)}
       style={[
         styles.messageBox,
         message.role === "user"
@@ -37,7 +39,7 @@ export default function ChatMessage({
       >
         {message.content}
       </Text>
-    </View>
+    </Animated.View>
   );
 }
 

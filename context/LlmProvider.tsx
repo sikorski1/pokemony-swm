@@ -1,11 +1,11 @@
 import { Pokemon } from "@/types/pokemon";
 import { createContext, ReactNode, useContext, useState } from "react";
 import {
-  LLAMA3_2_1B,
-  LLAMA3_2_TOKENIZER,
-  LLAMA3_2_TOKENIZER_CONFIG,
   LLMTool,
   LLMType,
+  QWEN3_1_7B,
+  QWEN3_TOKENIZER,
+  QWEN3_TOKENIZER_CONFIG,
   useLLM,
 } from "react-native-executorch";
 type ExtendedLLMContext = LLMType & {
@@ -34,9 +34,9 @@ const LLMContext = createContext<ExtendedLLMContext | null>(null);
 
 export const LLMProvider = ({ children }: { children: ReactNode }) => {
   const llm = useLLM({
-    modelSource: LLAMA3_2_1B,
-    tokenizerSource: LLAMA3_2_TOKENIZER,
-    tokenizerConfigSource: LLAMA3_2_TOKENIZER_CONFIG,
+    modelSource: QWEN3_1_7B,
+    tokenizerSource: QWEN3_TOKENIZER,
+    tokenizerConfigSource: QWEN3_TOKENIZER_CONFIG,
   });
 
   const [configuredPokemon, setConfiguredPokemon] = useState<string | null>(
@@ -47,14 +47,28 @@ export const LLMProvider = ({ children }: { children: ReactNode }) => {
     llm.configure({
       chatConfig: {
         systemPrompt: `You are a Pokémon named ${pokemon.name}.
-        You are a ${pokemon.types.join(" and ")}-type Pokémon.
-        Your base stats are:
-        - HP: ${pokemon.stats[0].base_stat}
-        - Attack: ${pokemon.stats[2].base_stat}
-        - Defense: ${pokemon.stats[4].base_stat}
-        - Speed: ${pokemon.stats[1].base_stat}
-        Stay in character and speak like a Pokémon.
-        `,
+You are a ${pokemon.types.join(" and ")}-type Pokémon.
+Your base stats are:
+- HP: ${pokemon.stats[0].base_stat}
+- Attack: ${pokemon.stats[2].base_stat}
+- Defense: ${pokemon.stats[4].base_stat}
+- Speed: ${pokemon.stats[1].base_stat}
+
+Stay in character and speak like a Pokémon.
+Don't use emojis.
+
+If you need to use a tool calling, always include your Pokémon name (which is "${pokemon.name}") in the tool call arguments explicitly. Do not omit it.`,
+      },
+      toolsConfig: {
+        tools: TOOL_DEFINITIONS,
+        executeToolCallback: async (call) => {
+          if (call.toolName === "get_pokemon_attacks") {
+            console.log("Tool call: ", call);
+            return "Solar Beam";
+          }
+          return null;
+        },
+        displayToolCalls: true,
       },
     });
 

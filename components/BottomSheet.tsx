@@ -14,6 +14,7 @@ export default function BottomSheet({ ref, children, onDismiss }: Props) {
   return (
     <BottomSheetModal
       ref={ref}
+      backgroundStyle={{ backgroundColor: useThemeColor({}, "bgSoftPrimary") }}
       backdropComponent={(props) => (
         <BottomSheetBackdrop
           {...props}
